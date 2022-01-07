@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ThAmCo.Events.Models;
 
 namespace ThAmCo.Events
 {
@@ -23,7 +25,13 @@ namespace ThAmCo.Events
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllers();
+            services.AddMvcCore().AddRazorViewEngine();
+            services.AddDbContext<EventContext>(options =>
+            {
+                var cs = Configuration.GetConnectionString("EventConnection");
+                options.UseSqlServer(cs);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,7 +58,7 @@ namespace ThAmCo.Events
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=events}/{action=Index}/{id?}");
             });
         }
     }
